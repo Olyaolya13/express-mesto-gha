@@ -15,15 +15,15 @@ mongoose.connect(DB_URL, {
 // .then(() => console.log('Connected to MongoDB'))
 // .catch((err) => console.log('Error connecting to MongoDB:', err));
 
-app.use('/users', require('./routes/users'));
-
 app.use((req, res, next) => {
   req.user = {
-    _id: '64d8d3202756670f93b3077d',
+    _id: '64d8e7094cf62da8739f142d',
   };
 
   next();
 });
+
+app.use('/users', require('./routes/users'));
 
 app.listen(PORT, () => {
   console.log('Server is listening');
