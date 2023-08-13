@@ -1,5 +1,11 @@
 const mongoose = require('mongoose');
 
+// Проверка на корректный URL
+function isValidURL(url) {
+  const urlPattern = /^(https?:\/\/)([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+  return urlPattern.test(url);
+}
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -17,10 +23,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator(url) {
-        const urlPattern = /^(https?:\/\/)([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
-        return urlPattern.test(url);
-      },
+      validator: isValidURL,
       message: 'Некорректный URL для аватара',
     },
   },
