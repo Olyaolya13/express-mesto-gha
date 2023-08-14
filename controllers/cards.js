@@ -44,3 +44,45 @@ module.exports.deleteCard = (req, res) => {
       res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
 };
+
+module.exports.cardLike = (req, res) => {
+  const { cardId } = req.params;
+  const userId = req.user._id;
+
+  Card.findByIdAndUpdate(
+    cardId,
+    { $addToSet: { likes: userId } },
+    { new: true },
+  )
+    .populate(['owner', 'likes'])
+    .then((card) => {
+      if (!card) {
+        return res.status(404).send({ message: 'Карточка не найдена' });
+      }
+      return res.send({ data: card });
+    })
+    .catch(() => {
+      res.status(500).send({ message: 'На сервере произошла ошибка' });
+    });
+};
+
+module.exports.deleteCardLike = (req, res) => {
+  const { cardId } = req.params;
+  const userId = req.user._id;
+
+  Card.findByIdAndUpdate(
+    cardId,
+    { $pull: { likes: userId } },
+    { new: true },
+  )
+    .populate(['owner', 'likes'])
+    .then((card) => {
+      if (!card) {
+        return res.status(404).send({ message: 'Карточка не найдена' });
+      }
+      return res.send({ data: card });
+    })
+    .catch(() => {
+      res.status(500).send({ message: 'На сервере произошла ошибка' });
+    });
+};
