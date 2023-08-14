@@ -20,7 +20,7 @@ module.exports.createCard = (req, res) => {
       Card.findById(card._id)
         .populate('owner')
         .then((data) => res.send(data))
-        .catch(() => res.status(400).send({ message: 'Карточка не найдена' }));
+        .catch(() => res.status(404).send({ message: 'Карточка не найдена' }));
     }).catch((err) => {
       if (err.name === 'ValidationError') { res.status(400).send({ message: err.message }); } else { res.status(500).send({ message: 'На сервере произошла ошибка' }); }
     });
@@ -30,7 +30,7 @@ module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(cardId)) {
-    return res.status(400).send({ message: 'Некорректные данные карточки' });
+    return res.status(404).send({ message: 'Некорректные данные карточки' });
   }
 
   return Card.findByIdAndRemove(cardId)
@@ -41,7 +41,7 @@ module.exports.deleteCard = (req, res) => {
       return res.send({ message: 'Карточка удалена' });
     })
     .catch(() => {
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      res.status(400).send({ message: 'Некорректный _id' });
     });
 };
 
@@ -62,7 +62,7 @@ module.exports.cardLike = (req, res) => {
       return res.send({ data: card });
     })
     .catch(() => {
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      res.status(400).send({ message: 'Некорекктный _id' });
     });
 };
 
@@ -83,6 +83,6 @@ module.exports.deleteCardLike = (req, res) => {
       return res.send({ data: card });
     })
     .catch(() => {
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      res.status(400).send({ message: 'Некорекктный _id' });
     });
 };
