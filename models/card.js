@@ -35,6 +35,6 @@ const cardSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-});
+}, { versionKey: false });// убираем версию документа (записи) в базе данных MongoDb);
 
 module.exports = mongoose.model('card', cardSchema);
