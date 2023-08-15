@@ -1,86 +1,69 @@
-const Card = require('../models/card');
+const mongoose = require('mongoose');
+const User = require('../models/user');
 
-module.exports.getCards = (req, res) => {
-  Card.find({})
-    .populate(['owner', 'likes'])
-    .then((cards) => {
-      res.send({ data: cards });
+module.exports.getUsers = (req, res) => {
+  User.find({})
+    .then((users) => {
+      res.send({ data: users });
     })
     .catch(() => {
       res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
 };
 
-module.exports.createCard = (req, res) => {
-  const { name, link } = req.body;
+module.exports.getUsersById = (req, res) => {
+  const { userId } = req.params;
 
-  Card.create({ name, link, owner: req.user._id })
-    .then((card) => {
-      Card.findById(card._id)
-        .populate('owner')
-        .then((data) => res.send(data))
-        .catch(() => res.status(404).send({ message: 'Карточка не найдена' }));
-    }).catch((err) => {
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).send({ message: 'Неверный _id' });
+  }
+
+  return User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        return res.status(400).send({ message: 'Пользователь не найден' });
+      }
+      return res.send({ data: user });
+    })
+    .catch(() => res.status(500).send({ message: 'На сервере произошла ошибка' }));
+};
+
+module.exports.createUsers = (req, res) => {
+  const { name, about, avatar } = req.body;
+
+  User.create({ name, about, avatar })
+    .then((user) => res.status(201).send({ data: user }))
+    .catch((err) => {
       if (err.name === 'ValidationError') { res.status(400).send({ message: err.message }); } else { res.status(500).send({ message: 'На сервере произошла ошибка' }); }
     });
 };
 
-module.exports.deleteCard = (req, res) => {
-  if (req.params.cardId.length !== 24) {
-    res.status(400).send({ message: 'Некорректный _id карточки' });
-    return;
-  }
-  Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => {
-      if (!card) {
-        res.status(404).send({ message: 'Карточка не найдена' });
-        return;
-      }
-      res.send({ data: card });
-    })
-    .catch(() => {
-      res.status(500).send({ message: 'Ошибка сервера при удалении карточки' });
+module.exports.editUsers = (req, res) => {
+  const { name, about } = req.body;
+  const userId = req.user._id;
+
+  User.findByIdAndUpdate(userId, { name, about }, {
+    new: true,
+    runValidators: true,
+    upsert: true,
+  })
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') { res.status(400).send({ message: err.message }); } else { res.status(404).send({ message: 'Пользователь не найден' }); }
     });
 };
 
-module.exports.cardLike = (req, res) => {
-  const { id } = req.params.cardId;
-  const { userId } = req.user._id;
+module.exports.editAvatar = (req, res) => {
+  const userId = req.user._id;
+  const { avatar } = req.body;
 
-  Card.findByIdAndUpdate(
-    id,
-    { $addToSet: { likes: userId } },
-    { new: true },
-  )
-    .populate(['owner', 'likes'])
-    .then((card) => {
-      if (!card) {
-        return res.status(404).send({ message: 'Карточка не найдена' });
-      }
-      return res.send({ data: card });
-    })
-    .catch(() => {
-      res.status(400).send({ message: 'Некорекктный _id' });
-    });
-};
-
-module.exports.deleteCardLike = (req, res) => {
-  const { cardId } = req.params;
-  const { userId } = req.user._id;
-
-  Card.findByIdAndUpdate(
-    cardId,
-    { $pull: { likes: userId } },
-    { new: true },
-  )
-    .populate(['owner', 'likes'])
-    .then((card) => {
-      if (!card) {
-        return res.status(404).send({ message: 'Карточка не найдена' });
-      }
-      return res.send({ data: card });
-    })
-    .catch(() => {
-      res.status(400).send({ message: 'Некорекктный _id' });
+  User.findByIdAndUpdate(userId, { avatar }, {
+    new: true,
+    runValidators: true,
+    upsert: true,
+  })
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') { res.status(400).send({ message: err.message }); } else { res.status(404).send({ message: 'Пользователь не найден' }); }
     });
 };
