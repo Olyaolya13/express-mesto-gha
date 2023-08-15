@@ -12,18 +12,24 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUsersById = (req, res) => {
-  if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
-    return res.status(404).send({ message: 'Неверный пользователь с некорректным id' });
+  const id = req.params.userId;
+
+  if (id.length !== 24) {
+    res.status(400).send({ message: 'Некорректный _id пользователя' });
+    return;
   }
 
-  return User.findById(req.params.userId)
+  User.findById(id)
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: 'Пользователь не найден' });
+        res.status(404).send({ message: 'Пользователь не найден' });
+        return;
       }
-      return res.send({ data: user });
+      res.send({ data: user });
     })
-    .catch(() => res.status(400).send({ message: 'Некорректный _id пользователя' }));
+    .catch(() => {
+      res.status(500).send({ message: 'На сервере произошла ошибка' });
+    });
 };
 
 module.exports.createUsers = (req, res) => {
