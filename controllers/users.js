@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const User = require('../models/user');
 
 module.exports.getUsers = (req, res) => {
@@ -12,22 +11,23 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUsersById = (req, res) => {
-  const { userId } = req.params;
+  const id = req.params.userId;
 
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(400).send({ message: 'Некорректный _id пользователя' });
+  if (id.length === 24) {
+    User.findById(id)
+      .then((user) => {
+        if (!user) {
+          res.status(404).send({ message: 'Пользователь не найден' });
+          return;
+        }
+        res.send({ data: user });
+      })
+      .catch(() => {
+        res.status(400).send({ message: 'Некорректный _id пользователя' });
+      });
+  } else {
+    res.status(404).send({ message: 'Пользователь не найден' });
   }
-
-  return User.findById(userId)
-    .then((user) => {
-      if (!user) {
-        return res.status(404).send({ message: 'Пользователь не найден' });
-      }
-      return res.send({ data: user });
-    })
-    .catch(() => {
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
-    });
 };
 
 module.exports.createUsers = (req, res) => {
