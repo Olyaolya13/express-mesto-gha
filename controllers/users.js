@@ -12,13 +12,13 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUsersById = (req, res) => {
-  const { userId } = req.params;
+  const { id } = req.params.userId;
 
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(404).send({ message: 'Неверный пользователь с некорректным id' });
   }
 
-  return User.findById(userId)
+  return User.findById(id)
     .then((user) => {
       if (!user) {
         return res.status(404).send({ message: 'Пользователь не найден' });
