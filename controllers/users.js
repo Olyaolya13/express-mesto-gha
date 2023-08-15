@@ -15,7 +15,7 @@ module.exports.getUsersById = (req, res) => {
   const { userId } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(404).send({ message: 'Неверный _id' });
+    return res.status(404).send({ message: 'Некорректный _id пользователя' });
   }
 
   return User.findById(userId)
@@ -25,7 +25,7 @@ module.exports.getUsersById = (req, res) => {
       }
       return res.send({ data: user });
     })
-    .catch(() => res.status(400).send({ message: 'Некорректный _id' }));
+    .catch(() => res.status(400).send({ message: 'Некорректный _id пользователя' }));
 };
 
 module.exports.createUsers = (req, res) => {

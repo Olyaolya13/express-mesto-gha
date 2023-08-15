@@ -41,7 +41,7 @@ module.exports.deleteCard = (req, res) => {
       return res.send({ message: 'Карточка удалена' });
     })
     .catch(() => {
-      res.status(400).send({ message: 'Некорректный _id' });
+      res.status(400).send({ message: 'Некорректный _id карточки' });
     });
 };
 
