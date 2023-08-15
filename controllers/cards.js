@@ -44,11 +44,10 @@ module.exports.deleteCard = (req, res) => {
 };
 
 module.exports.cardLike = (req, res) => {
-  const { id } = req.params.cardId;
-  const { userId } = req.user._id;
+  const userId = req.user._id;
 
   Card.findByIdAndUpdate(
-    id,
+    req.params.cardId,
     { $addToSet: { likes: userId } },
     { new: true },
   )
@@ -57,7 +56,7 @@ module.exports.cardLike = (req, res) => {
       if (!card) {
         return res.status(404).send({ message: 'Карточка не найдена' });
       }
-      return res.send({ data: card });
+      return res.status(200).send({ data: card });
     })
     .catch(() => {
       res.status(400).send({ message: 'Некорекктный _id' });
