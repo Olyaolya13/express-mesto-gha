@@ -26,23 +26,21 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  const { id } = req.params.cardId;
-
-  if (id.length !== 24) {
-    Card.findByIdAndRemove(id)
-      .then((card) => {
-        if (!card) {
-          res.status(404).send({ message: 'Карточка не найдена' });
-          return;
-        }
-        res.send({ data: card });
-      })
-      .catch(() => {
-        res.status(400).send({ message: 'Некорректный _id карточки' });
-      });
-  } else {
+  if (req.params.cardId.length !== 24) {
     res.status(400).send({ message: 'Некорректный _id карточки' });
+    return;
   }
+  Card.findByIdAndRemove(req.params.cardId)
+    .then((card) => {
+      if (!card) {
+        res.status(404).send({ message: 'Карточка не найдена' });
+        return;
+      }
+      res.send({ data: card });
+    })
+    .catch(() => {
+      res.status(500).send({ message: 'Ошибка сервера при удалении карточки' });
+    });
 };
 
 module.exports.cardLike = (req, res) => {
