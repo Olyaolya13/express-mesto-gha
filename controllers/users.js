@@ -11,7 +11,7 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUsersById = (req, res) => {
-  const id = req.params.userId;
+  const { id } = req.params.userId;
 
   if (id.length !== 24) {
     User.findById(id)
