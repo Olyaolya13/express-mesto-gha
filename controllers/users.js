@@ -25,7 +25,9 @@ module.exports.getUsersById = (req, res) => {
       }
       return res.send({ data: user });
     })
-    .catch(() => res.status(404).send({ message: 'Некорректный _id пользователя' }));
+    .catch(() => {
+      res.status(500).send({ message: 'На сервере произошла ошибка' });
+    });
 };
 
 module.exports.createUsers = (req, res) => {
