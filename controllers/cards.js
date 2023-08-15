@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
@@ -29,11 +28,12 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(cardId)) {
-    return res.status(404).send({ message: 'Некорректные данные карточки' });
+  if (cardId.length !== 24) {
+    res.status(404).send({ message: 'Карточка не найдена' });
+    return;
   }
 
-  return Card.findByIdAndRemove(cardId)
+  Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
         return res.status(404).send({ message: 'Карточка не найдена' });
