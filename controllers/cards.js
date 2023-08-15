@@ -26,31 +26,31 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  const { cardId } = req.params;
+  const { id } = req.params.cardId;
 
-  if (cardId.length !== 24) {
-    res.status(404).send({ message: 'Карточка не найдена' });
-    return;
+  if (id.length !== 24) {
+    Card.findByIdAndRemove(id)
+      .then((card) => {
+        if (!card) {
+          res.status(404).send({ message: 'Карточка не найдена' });
+          return;
+        }
+        res.send({ data: card });
+      })
+      .catch(() => {
+        res.status(400).send({ message: 'Некорректный _id карточки' });
+      });
+  } else {
+    res.status(400).send({ message: 'Некорректный _id карточки' });
   }
-
-  Card.findByIdAndRemove(cardId)
-    .then((card) => {
-      if (!card) {
-        return res.status(404).send({ message: 'Карточка не найдена' });
-      }
-      return res.send({ message: 'Карточка удалена' });
-    })
-    .catch(() => {
-      res.status(400).send({ message: 'Некорректный _id карточки' });
-    });
 };
 
 module.exports.cardLike = (req, res) => {
-  const { cardId } = req.params;
-  const userId = req.user._id;
+  const { id } = req.params.cardId;
+  const { userId } = req.user._id;
 
   Card.findByIdAndUpdate(
-    cardId,
+    id,
     { $addToSet: { likes: userId } },
     { new: true },
   )
@@ -68,7 +68,7 @@ module.exports.cardLike = (req, res) => {
 
 module.exports.deleteCardLike = (req, res) => {
   const { cardId } = req.params;
-  const userId = req.user._id;
+  const { userId } = req.user._id;
 
   Card.findByIdAndUpdate(
     cardId,
