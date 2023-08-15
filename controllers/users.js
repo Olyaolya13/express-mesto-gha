@@ -14,21 +14,20 @@ module.exports.getUsersById = (req, res) => {
   const id = req.params.userId;
 
   if (id.length !== 24) {
-    res.status(404).send({ message: 'Пользователь не найден' });
-    return;
+    User.findById(id)
+      .then((user) => {
+        if (!user) {
+          res.status(404).send({ message: 'Пользователь не найден' });
+          return;
+        }
+        res.send({ data: user });
+      })
+      .catch(() => {
+        res.status(400).send({ message: 'Некорректный _id пользователя' });
+      });
+  } else {
+    res.status(400).send({ message: 'Некорректный _id пользователя' });
   }
-
-  User.findById(id)
-    .then((user) => {
-      if (!user) {
-        res.status(404).send({ message: 'Пользователь не найден' });
-        return;
-      }
-      res.send({ data: user });
-    })
-    .catch(() => {
-      res.status(400).send({ message: 'Некорректный _id пользователя' });
-    });
 };
 
 module.exports.createUsers = (req, res) => {
