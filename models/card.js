@@ -1,23 +1,18 @@
 const mongoose = require('mongoose');
-
-// Проверка на корректный URL
-function isValidURL(url) {
-  const urlPattern = /^(https?:\/\/)([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
-  return urlPattern.test(url);
-}
+const validator = require('validator');
 
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
+    required: [true, 'Поле "name" должно быть заполнено'],
+    minlength: [2, 'Минимальная длина поля "name" - 2'],
+    maxlength: [30, 'Максимальная длина поля "name" - 30'],
   },
   link: {
     type: String,
     required: true,
     validate: {
-      validator: isValidURL,
+      validator: (v) => validator.isURL(v),
       message: 'Некорректный URL для картинки',
     },
   },
