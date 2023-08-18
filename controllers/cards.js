@@ -39,7 +39,7 @@ module.exports.deleteCard = (req, res) => {
       res.send({ data: card });
     })
     .catch(() => {
-      res.status(500).send({ message: 'Ошибка сервера при удалении карточки' });
+      res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -59,7 +59,7 @@ module.exports.cardLike = (req, res) => {
       return res.status(200).send({ data: card });
     })
     .catch(() => {
-      res.status(400).send({ message: 'Некорекктный _id' });
+      res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -80,6 +80,6 @@ module.exports.deleteCardLike = (req, res) => {
       return res.send({ data: card });
     })
     .catch(() => {
-      res.status(400).send({ message: 'Некорекктный _id' });
+      res.status(500).send({ message: 'На сервере произошла ошибка' }); // почему то не сохранилось
     });
 };
