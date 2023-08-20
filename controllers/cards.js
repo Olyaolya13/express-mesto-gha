@@ -80,6 +80,6 @@ module.exports.deleteCardLike = (req, res) => {
       return res.send({ data: card });
     })
     .catch(() => {
-      res.status(500).send({ message: 'На сервере произошла ошибка' }); // почему то не сохранилось
+      res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
 };
