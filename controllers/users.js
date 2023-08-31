@@ -1,8 +1,10 @@
 // const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const InternalServerError = require('../errors/internal-server-error');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
+const ConflictError = require('../errors/conflict-error');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -30,15 +32,26 @@ module.exports.getUsersById = (req, res, next) => {
     });
 };
 
-module.exports.createUsers = (req, res) => {
+module.exports.createUsers = (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    email, name, about, avatar, password,
   } = req.body;
-
-  User.create({ name, about, avatar })
+  // хешируем пароль
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create(
+      {
+        name, about, avatar, email, password: hash,
+      },
+    ))
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
-      if (err.name === 'ValidationError') { res.status(400).send({ message: err.message }); } else { res.status(500).send({ message: 'На сервере произошла ошибка' }); }
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Ошибка валидации'));
+      } else if (err.code === 11000) {
+        next(new ConflictError('Пользователь уже существует'));
+      } else {
+        next(err);
+      }
     });
 };
 
