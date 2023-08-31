@@ -1,12 +1,24 @@
 const User = require('../models/user');
+const InternalServerError = require('../errors/internal-server-error');
 
-module.exports.getUsers = (req, res) => {
+// module.exports.getUsers = (req, res) => {
+//   User.find({})
+//     .then((users) => {
+//       res.send({ data: users });
+//     })
+//     .catch(() => {
+//       res.status(500).send({ message: 'На сервере произошла ошибка' });
+//     });
+// };
+
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
       res.send({ data: users });
     })
     .catch(() => {
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      const err = new InternalServerError('На сервере произошла ошибка');
+      next(err);
     });
 };
 
