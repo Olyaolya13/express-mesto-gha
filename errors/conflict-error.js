@@ -1,4 +1,4 @@
-const { HTTP_STATUS_CONFLICT } = require('node:http2');// 409
+const { HTTP_STATUS_CONFLICT } = require('http2').constants;// 409
 
 class ConflictError extends Error {
   constructor(message) {

@@ -1,15 +1,8 @@
+// const mongoose = require('mongoose');
 const User = require('../models/user');
 const InternalServerError = require('../errors/internal-server-error');
-
-// module.exports.getUsers = (req, res) => {
-//   User.find({})
-//     .then((users) => {
-//       res.send({ data: users });
-//     })
-//     .catch(() => {
-//       res.status(500).send({ message: 'На сервере произошла ошибка' });
-//     });
-// };
+const NotFoundError = require('../errors/not-found-error');
+const BadRequestError = require('../errors/bad-request-error');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -22,22 +15,18 @@ module.exports.getUsers = (req, res, next) => {
     });
 };
 
-module.exports.getUsersById = (req, res) => {
-  if (req.params.userId.length !== 24) {
-    res.status(400).send({ message: 'Некорректный _id пользователя' });
-    return;
-  }
-
+module.exports.getUsersById = (req, res, next) => {
   User.findById(req.params.userId)
-    .then((user) => {
-      if (!user) {
-        res.status(404).send({ message: 'Пользователь не найден' });
-        return;
+    .orFail()
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Некорректные данные пользователя'));
+      } else if (err.name === 'DocumentNotFoundError') {
+        next(new NotFoundError(`Пользователь: ${req.params.userId} не найден`));
+      } else {
+        next(err);
       }
-      res.send({ data: user });
-    })
-    .catch(() => {
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
     });
 };
 
