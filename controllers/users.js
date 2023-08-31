@@ -23,7 +23,7 @@ module.exports.getUsersById = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректные данные пользователя'));
       } else if (err.name === 'DocumentNotFoundError') {
-        next(new NotFoundError(`Пользователь: ${req.params.userId} не найден`));
+        next(new NotFoundError(`Пользователь ${req.params.userId} не найден`));
       } else {
         next(err);
       }
@@ -31,7 +31,9 @@ module.exports.getUsersById = (req, res, next) => {
 };
 
 module.exports.createUsers = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
 
   User.create({ name, about, avatar })
     .then((user) => res.status(201).send({ data: user }))
