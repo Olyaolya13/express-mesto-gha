@@ -41,14 +41,20 @@ module.exports.createUsers = (req, res, next) => {
         name, about, avatar, email, password: hash,
       },
     ))
-    .then((users) => {
-      res.status(HTTP_STATUS_CREATED).send({ data: users });
+    .then((user) => {
+      res.status(HTTP_STATUS_CREATED).send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+        _id: user._id,
+      });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.code === 11000) {
+        next(new ConflictError('Пользователь с данным email уже существует'));
+      } else if (err.name === 'ValidationError') {
         next(new BadRequestError(err.message));
-      } else if (err.code === 11000) {
-        next(new ConflictError('Пользователь уже существует'));
       } else {
         next(err);
       }
