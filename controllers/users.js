@@ -42,7 +42,7 @@ module.exports.createUsers = (req, res, next) => {
       },
     ))
     .then((users) => {
-      res.status(201).send({ data: users });
+      res.status(HTTP_STATUS_CREATED).send({ data: users });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
