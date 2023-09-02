@@ -1,4 +1,4 @@
-const { HTTP_STATUS_CREATED } = require('http2').constants;
+const { HTTP_STATUS_CREATED, HTTP_STATUS_OK } = require('http2').constants;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
@@ -9,7 +9,7 @@ const ConflictError = require('../errors/conflict-error');
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
-      res.status(HTTP_STATUS_CREATED).send({ data: users });
+      res.status(HTTP_STATUS_OK).send({ data: users });
     })
     .catch(next);
 };
@@ -17,7 +17,7 @@ module.exports.getUsers = (req, res, next) => {
 module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
-      res.status(HTTP_STATUS_CREATED).send({ data: user });
+      res.status(HTTP_STATUS_OK).send({ data: user });
     })
     .catch(next);
 };
@@ -26,7 +26,7 @@ module.exports.getUsersById = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail()
     .then((users) => {
-      res.status(HTTP_STATUS_CREATED).send({ data: users });
+      res.status(HTTP_STATUS_OK).send({ data: users });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -103,7 +103,7 @@ module.exports.editAvatar = (req, res, next) => {
     upsert: true,
   })
     .then((users) => {
-      res.status(HTTP_STATUS_CREATED).send({ data: users });
+      res.status(HTTP_STATUS_OK).send({ data: users });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

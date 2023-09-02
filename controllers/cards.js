@@ -1,5 +1,4 @@
-const { HTTP_STATUS_CREATED } = require('http2').constants;
-const { HTTP_STATUS_NO_CONTENT } = require('http2').constants;
+const { HTTP_STATUS_CREATED, HTTP_STATUS_OK } = require('http2').constants;
 const Card = require('../models/card');
 const ForbiddenError = require('../errors/forbidden-error');
 const NotFoundError = require('../errors/not-found-error');
@@ -8,7 +7,7 @@ const BadRequestError = require('../errors/bad-request-error');
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
-    .then((cards) => res.status(HTTP_STATUS_CREATED).send({ data: cards }))
+    .then((cards) => res.status(HTTP_STATUS_OK).send({ data: cards }))
     .catch(next);
 };
 
@@ -45,7 +44,7 @@ module.exports.deleteCard = (req, res, next) => {
       }
       return Card.findByIdAndRemove(cardId);
     })
-    .then(() => res.status(HTTP_STATUS_CREATED).send({ message: 'Карточка удалена' }))
+    .then(() => res.status(HTTP_STATUS_OK).send({ message: 'Карточка удалена' }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректный _id карточки'));
@@ -66,7 +65,7 @@ module.exports.cardLike = (req, res, next) => {
     { new: true },
   ).orFail()
     .populate(['owner', 'likes'])
-    .then((card) => res.status(HTTP_STATUS_NO_CONTENT).send({ data: card }))
+    .then((card) => res.status(HTTP_STATUS_CREATED).send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректный _id карточки'));
@@ -88,7 +87,7 @@ module.exports.deleteCardLike = (req, res, next) => {
     { new: true },
   ).orFail()
     .populate(['owner', 'likes'])
-    .then((card) => res.status(HTTP_STATUS_NO_CONTENT).send({ data: card }))
+    .then((card) => res.status(HTTP_STATUS_CREATED).send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректный _id карточки'));
