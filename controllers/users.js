@@ -80,7 +80,7 @@ module.exports.editUsers = (req, res, next) => {
     upsert: true,
   })
     .then((users) => {
-      res.status(HTTP_STATUS_CREATED).send({ data: users });
+      res.status(HTTP_STATUS_OK).send({ data: users });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

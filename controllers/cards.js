@@ -87,7 +87,7 @@ module.exports.deleteCardLike = (req, res, next) => {
     { new: true },
   ).orFail()
     .populate(['owner', 'likes'])
-    .then((card) => res.status(HTTP_STATUS_CREATED).send({ data: card }))
+    .then((card) => res.status(HTTP_STATUS_OK).send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректный _id карточки'));
