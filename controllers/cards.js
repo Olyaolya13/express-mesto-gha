@@ -1,7 +1,7 @@
 const { HTTP_STATUS_CREATED } = require('http2').constants;
 const { HTTP_STATUS_NO_CONTENT } = require('http2').constants;
 const Card = require('../models/card');
-
+const ForbiddenError = require('../errors/forbidden-error');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequestError = require('../errors/bad-request-error');
 
@@ -34,9 +34,18 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  const userId = req.user._id;
+  const { cardId } = req.params;
+
+  Card.findById(cardId)
     .orFail()
-    .then(() => res.status(HTTP_STATUS_NO_CONTENT).send())
+    .then((card) => {
+      if (card.owner.toString() !== userId) {
+        next(new ForbiddenError('У вас нет прав на удаление этой карточки'));
+      }
+      return Card.findByIdAndRemove(cardId);
+    })
+    .then(() => res.status(HTTP_STATUS_CREATED).send({ message: 'Карточка удалена' }))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректный _id карточки'));
