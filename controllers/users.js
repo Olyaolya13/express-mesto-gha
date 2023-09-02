@@ -14,6 +14,14 @@ module.exports.getUsers = (req, res, next) => {
     .catch(next);
 };
 
+module.exports.getUserInfo = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      res.status(HTTP_STATUS_CREATED).send({ data: user });
+    })
+    .catch(next);
+};
+
 module.exports.getUsersById = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail()
