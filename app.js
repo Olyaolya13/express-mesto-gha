@@ -15,14 +15,6 @@ mongoose.connect(DB_URL, {
   useUnifiedTopology: true,
 });
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64f0a26fd59336957fca2080',
-  };
-
-  next();
-});
-
 const { login, createUsers } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 
