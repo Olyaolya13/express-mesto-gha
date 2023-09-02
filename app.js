@@ -2,7 +2,7 @@ const express = require('express');
 const helmet = require('helmet');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 
 const app = express();
 const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
@@ -21,8 +21,22 @@ const auth = require('./middlewares/auth');
 
 // роуты, не требующие авторизации,
 // например, регистрация и логин
-app.post('/signin', login);
-app.post('/signup', createUsers);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(2),
+  }),
+}), login);
+
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().pattern(/https?:\/\/.*\.?/),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(2),
+  }).unknown(true),
+}), createUsers);
 
 // авторизация
 app.use(auth);
@@ -34,6 +48,8 @@ app.use('/cards', require('./routes/cards'));
 app.use('*', (req, res) => {
   res.status(404).send({ message: 'Страница не найдена' });
 });
+
+app.use(errors());
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
