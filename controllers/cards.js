@@ -20,7 +20,7 @@ module.exports.createCard = (req, res, next) => {
       Card.findById(card._id)
         .orFail()
         .populate('owner')
-        .then((data) => res.status(HTTP_STATUS_CREATED).send({ data }))
+        .then((cards) => res.status(HTTP_STATUS_CREATED).send({ data: cards }))
         .catch((err) => {
           if (err.name === 'DocumentNotFoundError') {
             next(new NotFoundError('Карточка не найдена'));

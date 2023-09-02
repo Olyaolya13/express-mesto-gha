@@ -23,7 +23,20 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/', require('./routes/index'));
+const { login, createUsers } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+
+// роуты, не требующие авторизации,
+// например, регистрация и логин
+app.post('/signin', login);
+app.post('/signup', createUsers);
+
+// авторизация
+app.use(auth);
+
+// роуты, которым авторизация нужна
+app.use('/users', require('./routes/users'));
+app.use('/cards', require('./routes/cards'));
 
 app.use('*', (req, res) => {
   res.status(404).send({ message: 'Страница не найдена' });
