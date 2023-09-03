@@ -3,7 +3,7 @@ const { celebrate, Joi } = require('celebrate');
 const {
   getCards, createCard, deleteCard, cardLike, deleteCardLike,
 } = require('../controllers/cards');
-const UrlPattern = require('../errors/constants/constants');
+const { UrlPattern } = require('../errors/constants/constants');
 
 router.get('/', getCards);
 
