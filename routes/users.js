@@ -3,6 +3,7 @@ const { celebrate, Joi } = require('celebrate');
 const {
   getUsers, getUsersById, editUsers, editAvatar, getUserInfo,
 } = require('../controllers/users');
+const UrlPattern = require('./errors/constants/constants');
 
 router.get('/', getUsers);
 router.get('/me', getUserInfo);
@@ -23,7 +24,7 @@ router.patch('/me', celebrate({
 
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().pattern(/^(https?:\/\/)?[^\s/$.?#].[^\s]*$/),
+    avatar: Joi.string().pattern(UrlPattern),
   }),
 }), editAvatar);
 
