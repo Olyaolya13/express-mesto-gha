@@ -7,7 +7,7 @@ const BadRequestError = require('../errors/bad-request-error');
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
-    .then((cards) => res.status(HTTP_STATUS_OK).send({ data: cards }))
+    .then((cards) => res.status(HTTP_STATUS_OK).send(cards))
     .catch(next);
 };
 
@@ -19,7 +19,7 @@ module.exports.createCard = (req, res, next) => {
       Card.findById(card._id)
         .orFail()
         .populate('owner')
-        .then((cards) => res.status(HTTP_STATUS_CREATED).send({ data: cards }))
+        .then((cards) => res.status(HTTP_STATUS_CREATED).send(cards))
         .catch((err) => {
           if (err.name === 'DocumentNotFoundError') {
             next(new NotFoundError('Карточка не найдена'));
@@ -65,7 +65,7 @@ module.exports.cardLike = (req, res, next) => {
     { new: true },
   ).orFail()
     .populate(['owner', 'likes'])
-    .then((card) => res.status(HTTP_STATUS_CREATED).send({ data: card }))
+    .then((card) => res.status(HTTP_STATUS_CREATED).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректный _id карточки'));
@@ -87,7 +87,7 @@ module.exports.deleteCardLike = (req, res, next) => {
     { new: true },
   ).orFail()
     .populate(['owner', 'likes'])
-    .then((card) => res.status(HTTP_STATUS_OK).send({ data: card }))
+    .then((card) => res.status(HTTP_STATUS_OK).send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректный _id карточки'));

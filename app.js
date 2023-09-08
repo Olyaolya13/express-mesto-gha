@@ -3,10 +3,13 @@ const helmet = require('helmet');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
+const cors = require('cors');
 const { UrlPattern } = require('./errors/constants/constants');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
+app.use(cors());
 
 app.use(helmet()); // middleware для усиления безопасности
 app.use(bodyParser.json());// Обработка JSON-данных
@@ -20,8 +23,9 @@ mongoose.connect(DB_URL, {
 const { login, createUsers } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 
+app.use(requestLogger); // подключаем логгер запросов
+
 // роуты, не требующие авторизации,
-// например, регистрация и логин
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -49,6 +53,8 @@ app.use('/cards', require('./routes/cards'));
 app.use('*', (req, res) => {
   res.status(404).send({ message: 'Страница не найдена' });
 });
+
+app.use(errorLogger); // подключаем логгер ошибок
 
 app.use(errors());
 

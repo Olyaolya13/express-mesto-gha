@@ -9,7 +9,7 @@ const ConflictError = require('../errors/conflict-error');
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
-      res.status(HTTP_STATUS_OK).send({ data: users });
+      res.status(HTTP_STATUS_OK).send(users);
     })
     .catch(next);
 };
@@ -17,7 +17,7 @@ module.exports.getUsers = (req, res, next) => {
 module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
-      res.status(HTTP_STATUS_OK).send({ data: user });
+      res.status(HTTP_STATUS_OK).send(user);
     })
     .catch(next);
 };
@@ -26,7 +26,7 @@ module.exports.getUsersById = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail()
     .then((users) => {
-      res.status(HTTP_STATUS_OK).send({ data: users });
+      res.status(HTTP_STATUS_OK).send(users);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -78,9 +78,9 @@ module.exports.editUsers = (req, res, next) => {
     new: true,
     runValidators: true,
     upsert: true,
-  })
+  }).orFail()
     .then((users) => {
-      res.status(HTTP_STATUS_OK).send({ data: users });
+      res.status(HTTP_STATUS_OK).send(users);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -96,14 +96,15 @@ module.exports.editUsers = (req, res, next) => {
 module.exports.editAvatar = (req, res, next) => {
   const userId = req.user._id;
   const { avatar } = req.body;
+  console.log(avatar);
 
   User.findByIdAndUpdate(userId, { avatar }, {
     new: true,
     runValidators: true,
     upsert: true,
-  })
+  }).orFail()
     .then((users) => {
-      res.status(HTTP_STATUS_OK).send({ data: users });
+      res.status(HTTP_STATUS_OK).send(users);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -125,7 +126,7 @@ module.exports.login = (req, res, next) => {
         expiresIn: '1w',
       });
       // Записываем токен в httpOnly куку
-      res.cookie('jwt', token, { httpOnly: true });
+      // res.cookie('jwt', token, { httpOnly: true });
       res.send({ token });
     })
     .catch((err) => {
